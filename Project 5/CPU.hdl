@@ -1,0 +1,67 @@
+CHIP CPU {
+
+    IN  inM[16],         // M value input  (M = contents of RAM[A])
+        instruction[16], // Instruction for execution
+        reset;           // Signals whether to re-start the current
+                         // program (reset==1) or continue executing
+                         // the current program (reset==0).
+
+    OUT outM[16],        // M value output
+        writeM,          // Write to M? 
+        addressM[15],    // Address in data memory (of M)
+        pc[15];          // address of next instruction
+
+    PARTS:
+    //Se o primeiro bit da instrução for 0, esta é uma instrução do tipo A 
+    //e, portanto, deve ser carregada diretamente no registrador A;
+    //Se esta for um instrução do tipo C, caso o bit de destino d1 seja 1,
+    //o valor da saida da ALU deve ser armazenado no registrador A;
+
+    Not(in=instruction[15], out=Ainstruction);
+    Mux16(a=ALUoutput, b=instruction, sel=Ainstruction, out=Aaddress);
+
+    And(a=instruction[15], b=instruction[5], out=CinstructionToA);
+    Or(a=Ainstruction, b=CinstructionToA, out=loadA);
+    ARegister(in=Aaddress, load=loadA, out=Aoutput, out[0..14]=addressM);
+
+    //Se esta for um instrução do tipo C, caso o bit de destino d2 seja 1,
+    //o valor da saida da ALU deve ser armazenado no registrador D;
+
+    And(a=instruction[15], b=instruction[4], out=CinstructionToD);
+    DRegister(in=ALUoutput, load=CinstructionToD, out=ALUinput0);
+
+    //Se esta for uma instrução do tipo C e o bit a da instrução for 0,
+    //o valor a ser carregado na ALU sera o do regitrador A;
+    //Se esta for uma instrução do tipo C e o bit a da instrução for 1,
+    //o valor a ser carregado na ALU sera o da memória no endereço 
+    //apontado pelo registrador A;
+
+    And(a=instruction[15], b=instruction[12], out=CinstructionAorM);
+    Mux16(a=Aoutput, b=inM, sel=CinstructionAorM, out=ALUinput1);
+
+    //Os bits c1 a c6 indicaram os tipos de operações a serem realizadas
+    //pela ALU;
+
+    ALU(x=ALUinput0, y=ALUinput1, zx=instruction[11], nx=instruction[10],
+        zy=instruction[9], ny=instruction[8], f=instruction[7], 
+        no=instruction[6], out=ALUoutput, out=outM, zr=zero, ng=negative);
+
+    //Se esta for um instrução do tipo C, caso o bit de destino d3 seja 1,
+    //o valor da saida da ALU deve ser armazenado na memória; 
+
+    And(a=instruction[15], b=instruction[3], out=writeM); 
+
+    //Se a condição de salto for verdadeira, PC sera carregado com o endereço
+    //armazenado no registrador A;
+    //Se não, o endereço no PC é incrementado;
+
+    And(a=instruction[2], b=negative, out=jump0);
+    And(a=instruction[1], b=zero, out=jump1);
+    Or(a=negative, b=zero, out=notPositive);
+    Not(in=notPositive, out=positive);
+    And(a=instruction[0], b=positive, out=jump2);
+    Or8Way(in[0]=jump0, in[1]=jump1, in[2]=jump2, in[3..7]=false, out=jump3);
+    And(a=jump3, b=instruction[15], out=jump);
+    Not(in=jump, out=increment);
+    PC(in=Aoutput, load=jump, inc=increment, reset=reset, out[0..14]=pc);
+}
