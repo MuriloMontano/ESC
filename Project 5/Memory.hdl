@@ -3,23 +3,21 @@ CHIP Memory {
     OUT out[16];
 
     PARTS:
-    //Se o bit mais significativo do endereÁo for 0, o endereÁo se refere a RAM;
+    //Se o bit mais significativo do endere√ßo for 0, o endere√ßo se refere a RAM;
     //Se for 1, se refere aos dipositivos de I/O;
-    //O prÛximo bit especifica se o endereÁo se refere ‡ tela;
+    //O pr√≥ximo bit especifica se o endere√ßo se refere √† tela;
 
-    DMux(in=true, sel=address[14], a=RAMaddress, b=IOaddress);
-    DMux(in=IOaddress, sel=address[13], a=screenaddress);
+    DMux(in=load, sel=address[14], a=loadRAM, b=IOaddress);
+    DMux(in=IOaddress, sel=address[13], a=loadScreen);
 
-    And(a=RAMaddress, b=load, out=loadRAM);
     RAM16K(in=in, load=loadRAM, address=address[0..13], out=RAMout);
 
-    And(a=screenaddress, b=load, out=loadScreen);
     Screen(in=in, load=loadScreen, address=address[0..12], out=screenout);
 
     Keyboard(out=keyboardout);
 
-    //Da mesma forma que a entrada, ser„o os dois primeiros bits que decidir„oo
-    //qual chip deve fornecer a saÌda;
+    //Da mesma forma que a entrada, ser√£o os dois primeiros bits que decidir√£oo
+    //qual chip deve fornecer a sa√≠da;
 
     Mux16(a=screenout, b=keyboardout, sel=address[13], out=IOout);
     Mux16(a=RAMout, b=IOout, sel=address[14], out=out); 
