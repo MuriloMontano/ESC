@@ -1,0 +1,41 @@
+class Bomb {
+
+   field int x, y, r, expSize;
+
+	constructor Bomb new() {
+		let r = 8; 
+		let expSize = 64;
+		let x = 250;
+		let y = 125;
+		return this;
+   }
+
+   method void dispose() {
+		do Memory.deAlloc(this);
+		return;
+   }
+
+   method void plant(int Ax, int Ay, int count, boolean planted) {
+		if (planted) {
+			let x = Ax;
+			let y = Ay;
+			do Screen.setColor(true);
+			do Screen.drawCircle(x, y, r);
+			if (count = 10000) { do explode(); }
+		}
+		return;
+   }
+
+   method void explode() {
+		do Screen.setColor(false);	
+   		do Screen.drawCircle(x, y, r);
+		do Screen.setColor(true);
+		do Screen.drawRectangle(x-4, y-32, x+4, y-32+expSize);
+		do Screen.drawRectangle(x-32, y-4, x-32+expSize, y+4);
+		do Sys.wait(100);
+		do Screen.setColor(false);			
+		do Screen.drawRectangle(x-4, y-32, x+4, y-32+expSize);
+		do Screen.drawRectangle(x-32, y-4, x-32+expSize, y+4);
+		return;
+   }
+}

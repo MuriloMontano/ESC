@@ -1,0 +1,150 @@
+//D:\Users\muril\OneDrive\Documentos\UFU\6_semestre\ESC\projetos\Project 8\ProgramFlow\BasicLoop\BasicLoop.asm
+//PUSH constant 0
+@0
+D=A
+@SP
+A=M
+M=D
+@SP
+M=M+1
+//POP local 0
+@0
+D=A
+@LCL
+D=D+M
+@tempVariable
+M=D
+@SP
+M=M-1
+A=M
+D=M
+@tempVariable
+A=M
+M=D
+@tempVariable
+M=0
+//LABEL LOOP_START
+(LOOP_START)
+//PUSH argument 0
+@0
+D=A
+@ARG
+A=D+M
+D=M
+@SP
+A=M
+M=D
+@SP
+M=M+1
+//PUSH local 0
+@0
+D=A
+@LCL
+A=D+M
+D=M
+@SP
+A=M
+M=D
+@SP
+M=M+1
+//add
+@SP
+M=M-1
+A=M-1
+D=M
+@SP
+A=M
+D=D+M
+@SP
+A=M-1
+M=D
+//POP local 0	
+@0	
+D=A
+@LCL
+D=D+M
+@tempVariable
+M=D
+@SP
+M=M-1
+A=M
+D=M
+@tempVariable
+A=M
+M=D
+@tempVariable
+M=0
+//PUSH argument 0
+@0
+D=A
+@ARG
+A=D+M
+D=M
+@SP
+A=M
+M=D
+@SP
+M=M+1
+//PUSH constant 1
+@1
+D=A
+@SP
+A=M
+M=D
+@SP
+M=M+1
+//sub
+@SP
+M=M-1
+A=M-1
+D=M
+@SP
+A=M
+D=D-M
+@SP
+A=M-1
+M=D
+//POP argument 0
+@0
+D=A
+@ARG
+D=D+M
+@tempVariable
+M=D
+@SP
+M=M-1
+A=M
+D=M
+@tempVariable
+A=M
+M=D
+@tempVariable
+M=0
+//PUSH argument 0
+@0
+D=A
+@ARG
+A=D+M
+D=M
+@SP
+A=M
+M=D
+@SP
+M=M+1
+//IF-GOTO LOOP_START
+@SP
+AM=M-1
+D=M
+@LOOP_START
+D; JNE
+//PUSH local 0
+@0
+D=A
+@LCL
+A=D+M
+D=M
+@SP
+A=M
+M=D
+@SP
+M=M+1
