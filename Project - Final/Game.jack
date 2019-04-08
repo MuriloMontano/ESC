@@ -1,0 +1,458 @@
+class Game {
+	field int xMax, xMin, yMax, yMin; // Limites do campo
+
+	field Character player1, player2;
+	field Bomb bombPlayer1, bombPlayer2;
+
+	field int amountOfBlocks, amountOfBoxes;
+
+	constructor Game new(int AxMax, int AxMin, int AyMax, int AyMin) {	
+		let xMax = AxMax;
+		let xMin = AxMin;
+		let yMax = AyMax;
+		let yMin = AyMin;
+
+		do drawScenario();
+
+		let player1 = Character.new(xMax-1, yMax-16, 1);
+		let player2 = Character.new(xMin+1, yMin+16, 2);
+		let bombPlayer1 = Bomb.new();
+		let bombPlayer2 = Bomb.new();
+
+		return this;
+	}
+
+	method void dispose() {
+		do player1.dispose();
+		do player2.dispose();
+		do bombPlayer1.dispose();
+		do bombPlayer2.dispose();
+
+		do Memory.deAlloc(this);
+
+		return;
+	}
+
+	method void drawBrick(int location) {
+		var int memAddress;
+
+		let memAddress = 16384+location;
+
+		do Memory.poke(memAddress+0, -1);
+		do Memory.poke(memAddress+32, -32735);
+		do Memory.poke(memAddress+64, -32735);
+		do Memory.poke(memAddress+96, -32735);
+		do Memory.poke(memAddress+128, -32735);
+		do Memory.poke(memAddress+160, -1);
+		do Memory.poke(memAddress+192, -31743);
+		do Memory.poke(memAddress+224, -31743);
+		do Memory.poke(memAddress+256, -31743);
+		do Memory.poke(memAddress+288, -31743);
+		do Memory.poke(memAddress+320, -1);
+		do Memory.poke(memAddress+352, -32735);
+		do Memory.poke(memAddress+384, -32735);
+		do Memory.poke(memAddress+416, -32735);
+		do Memory.poke(memAddress+448, -32735);
+		do Memory.poke(memAddress+480, -1);
+
+		return;
+	}
+
+	method void drawBlock(int location) {
+		var int memAddress;
+		
+		let memAddress = 16384+location;
+
+		do Memory.poke(memAddress+0, 0);
+		do Memory.poke(memAddress+32, 32766);
+		do Memory.poke(memAddress+64, 32766);
+		do Memory.poke(memAddress+96, 24582);
+		do Memory.poke(memAddress+128, 24582);
+		do Memory.poke(memAddress+160, 24582);
+		do Memory.poke(memAddress+192, 24582);
+		do Memory.poke(memAddress+224, 24582);
+		do Memory.poke(memAddress+256, 24582);
+		do Memory.poke(memAddress+288, 24582);
+		do Memory.poke(memAddress+320, 24582);
+		do Memory.poke(memAddress+352, 24582);
+		do Memory.poke(memAddress+384, 24582);
+		do Memory.poke(memAddress+416, 32766);
+		do Memory.poke(memAddress+448, 32766);
+		do Memory.poke(memAddress+480, 0);
+
+		return;
+	}
+
+	method void drawBox(int location) {
+		var int memAddress;
+
+		let memAddress = 16384+location;
+
+		do Memory.poke(memAddress+0, 0);
+		do Memory.poke(memAddress+32, 32766);
+		do Memory.poke(memAddress+64, 32766);
+		do Memory.poke(memAddress+96, 29254);
+		do Memory.poke(memAddress+128, 31302);
+		do Memory.poke(memAddress+160, 28230);
+		do Memory.poke(memAddress+192, 26182);
+		do Memory.poke(memAddress+224, 25414);
+		do Memory.poke(memAddress+256, 25542);
+		do Memory.poke(memAddress+288, 25286);
+		do Memory.poke(memAddress+320, 25190);
+		do Memory.poke(memAddress+352, 25206);
+		do Memory.poke(memAddress+384, 25182);
+		do Memory.poke(memAddress+416, 32766);
+		do Memory.poke(memAddress+448, 32766);
+		do Memory.poke(memAddress+480, 0);
+
+		return;
+	}
+
+	method void erase(int location) {
+		var int memAddress;
+
+		let memAddress = 16384+location;
+
+		do Memory.poke(memAddress+0, 0);
+		do Memory.poke(memAddress+32, 0);
+		do Memory.poke(memAddress+64, 0);
+		do Memory.poke(memAddress+96, 0);
+		do Memory.poke(memAddress+128, 0);
+		do Memory.poke(memAddress+160, 0);
+		do Memory.poke(memAddress+192, 0);
+		do Memory.poke(memAddress+224, 0);
+		do Memory.poke(memAddress+256, 0);
+		do Memory.poke(memAddress+288, 0);
+		do Memory.poke(memAddress+320, 0);
+		do Memory.poke(memAddress+352, 0);
+		do Memory.poke(memAddress+384, 0);
+		do Memory.poke(memAddress+416, 0);
+		do Memory.poke(memAddress+448, 0);
+		do Memory.poke(memAddress+480, 0);
+
+		return;
+	}
+
+	method void drawScenario() {
+		var int count;
+
+		// Preenche o limite inferior do cenario com tijolos
+
+		let count = xMin;
+
+		while (count < xMax) {
+			do drawBrick(count+(32*yMin));
+			let count = count+1;
+		}
+
+		// Preenche o limite superior do cenario com tijolos
+
+		let count = xMin;
+
+		while (count < (xMax+1)) {
+			do drawBrick(count+(32*yMax));
+			let count = count+1;
+		}
+
+		// Preenche o limite da esquerda do cenario com tijolos
+
+		let count = yMin;
+
+		while (count < yMax) {
+			do drawBrick(xMin+(32*count));
+			let count = count+16;
+		}
+
+		// Preenche o limite da direita do cenario com tijolos
+
+		let count = yMin;
+
+		while (count < yMax) {
+			do drawBrick(xMax+(32*count));
+			let count = count+16;
+		}
+
+		// Preenche o cenario com as caixas
+		do drawBoxesInScenario();
+
+		// Preenche o cenario com os blocos
+		do drawBlocksInScenario();
+
+		return;
+	}
+
+	method void drawBoxesInScenario() {
+		var int countObstaclePerColumn, countObstaclePerLine, obstaclePerColumn, obstaclePerLine, obstacleLocation;		
+
+		let countObstaclePerLine = 1;		
+
+		// Quantidade maxima de caixas por linha e por coluna
+		let obstaclePerLine = (xMax-(xMin));
+		let obstaclePerColumn = (yMax-(yMin))/16;
+		
+		while (countObstaclePerLine < obstaclePerLine) {
+			let countObstaclePerColumn = 1;
+
+			while (countObstaclePerColumn < obstaclePerColumn) {
+				let obstacleLocation = countObstaclePerLine+(32*16*countObstaclePerColumn);
+
+				do drawBox(obstacleLocation);
+
+				let countObstaclePerColumn = countObstaclePerColumn+1;
+			}
+
+			let countObstaclePerLine = countObstaclePerLine+1;
+		}
+
+		// Remove as caixas nas areas de spawn dos personagens
+
+		do erase((xMax-1)+(32*(yMax-16)));
+		do erase((xMax-2)+(32*(yMax-16)));
+		do erase((xMax-1)+(32*(yMax-32)));
+
+		do erase((xMin+1)+(32*(yMin+16)));
+		do erase((xMin+2)+(32*(yMin+16)));
+		do erase((xMin+1)+(32*(yMin+32)));
+
+		do erase((xMax-1)+(32*(yMin+16)));
+		do erase((xMax-2)+(32*(yMin+16)));
+		do erase((xMax-1)+(32*(yMin+32)));
+
+		do erase((xMin+1)+(32*(yMax-16)));
+		do erase((xMin+2)+(32*(yMax-16)));
+		do erase((xMin+1)+(32*(yMax-32)));
+
+		return;
+	}
+
+	method void drawBlocksInScenario() {
+		var int countObstaclePerColumn, countObstaclePerLine, obstaclePerColumn, obstaclePerLine, obstacleLocation;
+
+		let countObstaclePerLine = 2;		
+
+		// Quantidade maxima de caixas por linha e por coluna
+		let obstaclePerColumn = (yMax-(yMin))/16;
+		let obstaclePerLine = (xMax-(xMin));
+
+		while (countObstaclePerLine < obstaclePerLine) {
+			let countObstaclePerColumn = 2;
+
+			while (countObstaclePerColumn < obstaclePerColumn) {
+				let obstacleLocation = countObstaclePerLine+(32*16*countObstaclePerColumn);
+
+				do drawBlock(obstacleLocation);
+
+				let countObstaclePerColumn = countObstaclePerColumn+2;
+			}
+
+			let countObstaclePerLine = countObstaclePerLine+2;
+		}
+
+		return;
+	}
+
+	method boolean theresBlock(int location) {
+		var int i, count;
+
+		let i = 0;
+		let count = 0;
+
+		// Verifica na memoria se ha algo impresso na posicao informada
+		while (i < 480) { if (~(Memory.peek(16384+location+i) = 0)) { return true; } let i = i+32; }
+
+		return false;
+	}
+
+	method void moveCharacter(Character character, int direction, int countMove) {
+		var int charNextLocation;
+
+		// Gera um atraso para sensação de movimento
+		if(countMove > 10) {
+			// Verifica se a posicao futura nao esta ocupada
+			// Em caso afirmativo, invoca o metodo de movimento, correspondente a direcao desejada, da classe do personagem
+
+			if (direction = 1) {
+
+				let charNextLocation = (character.getCurrentX()+(32*(character.getCurrentY()-16)));
+
+				if (~theresBlock(charNextLocation)) { do character.moveUp(); } 
+			}
+			if (direction = 2) { 
+				let charNextLocation = (character.getCurrentX()+(32*(character.getCurrentY()+16)));
+				if (~theresBlock(charNextLocation)) { do character.moveDown(); }
+			}
+			if (direction = 3) { 
+				let charNextLocation = ((character.getCurrentX()-1)+(32*character.getCurrentY()));
+				if (~theresBlock(charNextLocation)) { do character.moveLeft(); } 
+			}
+			if (direction = 4) { 
+				let charNextLocation = ((character.getCurrentX()+1)+(32*character.getCurrentY()));
+				if (~theresBlock(charNextLocation)) { do character.moveRight(); } 
+			}
+		}
+
+		return;
+	}
+
+	method void run() {
+		var char key;
+
+		var int bombX, bombY;
+		var int bombTimeOut;
+
+		var int countBombPlayer1, countBombPlayer2;
+		var int countMovePlayer1, countMovePlayer2;
+
+		var boolean exit;
+		var boolean plantedBomb1, plantedBomb2; // Limita a uma bomba plantada por vez para cada jogador
+
+		let bombTimeOut = 30000;
+
+		let countBombPlayer1 = 0;
+		let countBombPlayer2 = 0;
+
+		let countMovePlayer1 = 0;
+		let countMovePlayer2 = 0;
+
+		let exit = false;
+
+		let plantedBomb1 = false;
+		let plantedBomb2 = false;
+
+		while (~exit) {
+			let key = Keyboard.keyPressed(); // Recebe a entrada do teclado
+
+			let countMovePlayer1 = countMovePlayer1+1;
+			let countMovePlayer2 = countMovePlayer2+1;
+
+			// Teclas de movimento do jogador 1			
+			if (key = 131) { do moveCharacter(player1, 1, countMovePlayer1); let countMovePlayer1 = 0; }  // up arrow
+			if (key = 133) { do moveCharacter(player1, 2, countMovePlayer1); let countMovePlayer1 = 0; }  // down arrow
+			if (key = 130) { do moveCharacter(player1, 3, countMovePlayer1); let countMovePlayer1 = 0; }  // left arrow
+			if (key = 132) { do moveCharacter(player1, 4, countMovePlayer1); let countMovePlayer1 = 0; }  // right arrow
+
+			// Teclas de movimento do jogador 2
+			if (key = 87) { do moveCharacter(player2, 1, countMovePlayer2); let countMovePlayer2 = 0; }  // W key
+			if (key = 83) { do moveCharacter(player2, 2, countMovePlayer2); let countMovePlayer2 = 0; }  // S key
+			if (key = 65) { do moveCharacter(player2, 3, countMovePlayer2); let countMovePlayer2 = 0; }  // A key
+			if (key = 68) { do moveCharacter(player2, 4, countMovePlayer2); let countMovePlayer2 = 0; }  // D key
+
+			// Tecla de insersao da bomba do jogador 1	
+			if ((key = 48) & (~plantedBomb1)) {  
+				do bombPlayer1.plant(player1.getCurrentX()*16+8, player1.getCurrentY()+8);
+				let plantedBomb1 = true;
+			} // 0 key
+
+			// Tecla de insersao da bomba do jogador 2
+			if ((key = 70) & (~plantedBomb2)) {  
+				do bombPlayer2.plant(player2.getCurrentX()*16+8, player2.getCurrentY()+8);
+				let plantedBomb2 = true;
+			} // F key
+			 
+			if (plantedBomb1) {
+				let countBombPlayer1 = countBombPlayer1 + 1;
+
+				do bombPlayer1.drawBomb();
+
+				if (countBombPlayer1 > bombTimeOut) {
+					if (
+							bombPlayer1.explode(
+								player1.getCurrentX()*16,
+								player1.getCurrentY(),
+								player2.getCurrentX()*16,
+								player2.getCurrentY(),
+								xMax*16, (xMin*16)+16,
+								yMax, yMin+16
+							)
+						) { do gameOver(); let exit = true; }
+					else { do drawBlocksInScenario(); }
+
+					let countBombPlayer1 = 0; 
+					let plantedBomb1 = false; 
+				}
+			}
+
+			if (plantedBomb2) {
+				let countBombPlayer2 = countBombPlayer2 + 1;
+
+				do bombPlayer2.drawBomb();
+
+				if (countBombPlayer2 > bombTimeOut) {
+					if (
+							bombPlayer2.explode(
+								player2.getCurrentX()*16,
+								player2.getCurrentY(),
+								player1.getCurrentX()*16,
+								player1.getCurrentY(),
+								xMax*16,
+								(xMin*16)+16,
+								yMax,
+								yMin+16
+							)
+						) { do gameOver(); let exit = true; }
+					else { do drawBlocksInScenario(); }
+
+					let countBombPlayer2 = 0; 
+					let plantedBomb2 = false; 
+				}
+			}
+		}
+
+		return;
+	}
+
+	method void gameOver() {
+		var int memAddress;
+
+		do Output.moveCursor(11, 27); 
+		do Screen.clearScreen(); 
+		do Output.printString("Game Over!");
+
+		let memAddress = 16384+(20+(32*97));
+
+		do Memory.poke(memAddress+64, 112);
+		do Memory.poke(memAddress+96, 136);
+		do Memory.poke(memAddress+128, 380);
+		do Memory.poke(memAddress+160, 578);
+		do Memory.poke(memAddress+192, 578);
+		do Memory.poke(memAddress+224, 578);
+		do Memory.poke(memAddress+256, 578);
+		do Memory.poke(memAddress+288, 578);
+		do Memory.poke(memAddress+320, 578);
+		do Memory.poke(memAddress+352, 380);
+		do Memory.poke(memAddress+384, 136);
+		do Memory.poke(memAddress+416, 112);
+
+		let memAddress = 16384+(11+(32*110));
+
+		do Memory.poke(memAddress+64, 6144);
+		do Memory.poke(memAddress+96, 7168);
+		do Memory.poke(memAddress+128, 2560);
+		do Memory.poke(memAddress+160, 6912);
+		do Memory.poke(memAddress+192, 4352);
+		do Memory.poke(memAddress+224, 4352);
+		do Memory.poke(memAddress+256, 4352);
+		do Memory.poke(memAddress+288, 4352);
+		do Memory.poke(memAddress+320, 6912);
+		do Memory.poke(memAddress+352, 2560);
+		do Memory.poke(memAddress+384, 7168);
+		do Memory.poke(memAddress+416, 6144);
+
+		let memAddress = 16384+(10+(32*150));
+
+		do Memory.poke(memAddress+384, 224);
+		do Memory.poke(memAddress+416, 160);
+		do Memory.poke(memAddress+448, 80);
+		do Memory.poke(memAddress+480, 120);
+
+		let memAddress = 16384+(19+(32*143));
+
+		do Memory.poke(memAddress+96, 16384);
+		do Memory.poke(memAddress+128, 24576);
+		do Memory.poke(memAddress+160, 22528);
+		do Memory.poke(memAddress+192, 26624);
+		do Memory.poke(memAddress+224, 6144);
+
+		return;
+	}
+}

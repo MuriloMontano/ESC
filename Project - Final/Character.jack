@@ -1,0 +1,137 @@
+class Character {
+
+   field int memAddress, currentX, currentY, playerSkin, currentLocation;
+
+	constructor Character new(int Ax, int Ay, int playerNumber) {
+		let currentX = Ax;
+		let currentY = Ay;
+
+		let playerSkin = playerNumber;
+
+		do draw();
+
+		return this;
+   }
+
+   method void dispose() {
+		do Memory.deAlloc(this);
+		return;
+   }
+
+   method void setCurrentX(int Ax) {
+		let currentX = Ax;
+		return;
+	}
+
+	method void setCurrentY(int Ay) {
+		let currentY = Ay;
+		return;
+	}
+
+   method int getCurrentX() {
+		return currentX;
+   }
+
+   method int getCurrentY() {
+		return currentY;
+   }
+
+   method void draw() {
+
+   		if (playerSkin = 1) { do drawPlayerOne();	}
+		else { do drawPlayerTwo(); }
+
+		return;
+   }
+
+   method void drawPlayerOne() {
+		let memAddress = 16384+(currentX+(32*currentY));
+		do Memory.poke(memAddress+0, 2016);
+		do Memory.poke(memAddress+32, 2064);
+		do Memory.poke(memAddress+64, 4104);
+		do Memory.poke(memAddress+96, 12276);
+		do Memory.poke(memAddress+128, 10260);
+		do Memory.poke(memAddress+160, 10836);
+		do Memory.poke(memAddress+192, 6744);
+		do Memory.poke(memAddress+224, 2064);
+		do Memory.poke(memAddress+256, 2016);
+		do Memory.poke(memAddress+288, 3120);
+		do Memory.poke(memAddress+320, 4104);
+		do Memory.poke(memAddress+352, 15420);
+		do Memory.poke(memAddress+384, 14316);
+		do Memory.poke(memAddress+416, 1440);
+		do Memory.poke(memAddress+448, 2640);
+		do Memory.poke(memAddress+480, 7800);
+		return;
+	}
+
+	method void drawPlayerTwo() {
+		let memAddress = 16384+(currentX+(32*currentY));
+		do Memory.poke(memAddress+0, 2016);
+		do Memory.poke(memAddress+32, 4080);
+		do Memory.poke(memAddress+64, 8184);
+		do Memory.poke(memAddress+96, 16380);
+		do Memory.poke(memAddress+128, 14364);
+		do Memory.poke(memAddress+160, 14940);
+		do Memory.poke(memAddress+192, 6744);
+		do Memory.poke(memAddress+224, 2064);
+		do Memory.poke(memAddress+256, 2016);
+		do Memory.poke(memAddress+288, 4080);
+		do Memory.poke(memAddress+320, 8184);
+		do Memory.poke(memAddress+352, 16380);
+		do Memory.poke(memAddress+384, 13356);
+		do Memory.poke(memAddress+416, 2016);
+		do Memory.poke(memAddress+448, 3696);
+		do Memory.poke(memAddress+480, 7800);
+		return;
+	}
+
+	method void erase() {
+		let memAddress = 16384+(currentX+(32*currentY));
+		do Memory.poke(memAddress+0, 0);
+		do Memory.poke(memAddress+32, 0);
+		do Memory.poke(memAddress+64, 0);
+		do Memory.poke(memAddress+96, 0);
+		do Memory.poke(memAddress+128, 0);
+		do Memory.poke(memAddress+160, 0);
+		do Memory.poke(memAddress+192, 0);
+		do Memory.poke(memAddress+224, 0);
+		do Memory.poke(memAddress+256, 0);
+		do Memory.poke(memAddress+288, 0);
+		do Memory.poke(memAddress+320, 0);
+		do Memory.poke(memAddress+352, 0);
+		do Memory.poke(memAddress+384, 0);
+		do Memory.poke(memAddress+416, 0);
+		do Memory.poke(memAddress+448, 0);
+		do Memory.poke(memAddress+480, 0);
+		return;
+	}
+
+	method void moveUp() {
+		do erase();
+		let currentY = currentY-16;
+		do draw();
+		return;
+	}
+
+	method void moveDown() {
+		do erase();
+		let currentY = currentY+16;
+		do draw();
+		return;
+	}
+
+	method void moveLeft() {
+		do erase();
+		let currentX = currentX-1;
+		do draw();
+		return;
+	}
+
+	method void moveRight() {
+		do erase();
+		let currentX = currentX+1;
+		do draw();
+		return;
+	}
+}

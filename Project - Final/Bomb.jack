@@ -1,0 +1,87 @@
+class Bomb {
+
+   field int x, y, r, expSize;
+
+	constructor Bomb new() {
+		let r = 7; 
+		let expSize = 48;
+		let x = 250;
+		let y = 125;
+		return this;
+   }
+
+   method void dispose() {
+		do Memory.deAlloc(this);
+		return;
+   }
+
+   method void plant(int Ax, int Ay) {
+		let x = Ax;
+		let y = Ay;
+
+		return;
+   }
+
+   method void drawBomb() {
+		do Screen.setColor(true);
+		do Screen.drawCircle(x, y, r);
+
+		return;
+   }
+
+   method int getX() {
+		return x;
+   }
+
+   method int getY() {
+		return (y-8);
+   }
+
+   method boolean explode(int charOneX, int charOneY, int charTwoX, int charTwoY, int xMax, int xMin, int yMax, int yMin) {
+		var int xMaxBomb, xMinBomb, yMaxBomb, yMinBomb, xYMin, xYBomb, yXBomb;
+
+		let xMinBomb = x-(expSize/2);
+		let xMaxBomb = (x+(expSize/2))-1;
+
+		let yMinBomb = y-(expSize/2);
+		let yMaxBomb = (y+(expSize/2))-1;
+
+		do Screen.setColor(true);
+
+		if (yMinBomb < yMin) { do Screen.drawRectangle(x-8, yMin, x+7, yMaxBomb); }
+		else { 
+			if (yMaxBomb > yMax) { do Screen.drawRectangle(x-8, yMinBomb, x+7, yMax-1); }
+			else { do Screen.drawRectangle(x-8, yMinBomb, x+7, yMaxBomb); }
+		}
+
+		if (xMinBomb < xMin) { do Screen.drawRectangle(xMin, y-8, xMaxBomb, y+7); }
+		else { 
+			if (xMaxBomb > xMax) { do Screen.drawRectangle(xMinBomb, y-8, xMax-1, y+7); }
+			else { do Screen.drawRectangle(xMinBomb, y-8, xMaxBomb, y+7); }
+		}
+
+		do Sys.wait(100);
+
+		do Screen.setColor(false);			
+		
+		if (yMinBomb < yMin) { do Screen.drawRectangle(x-8, yMin, x+7, yMaxBomb); }
+		else { 
+			if (yMaxBomb > yMax) { do Screen.drawRectangle(x-8, yMinBomb, x+7, yMax-1); }
+			else { do Screen.drawRectangle(x-8, yMinBomb, x+7, yMaxBomb); }
+		}
+
+		if (xMinBomb < xMin) { do Screen.drawRectangle(xMin, y-8, xMaxBomb, y+7); }
+		else { 
+			if (xMaxBomb > xMax) { do Screen.drawRectangle(xMinBomb, y-8, xMax-1, y+7); }
+			else { do Screen.drawRectangle(xMinBomb, y-8, xMaxBomb, y+7); }
+		}
+
+		let xYBomb = y-8;
+
+		let yXBomb = x-8;
+
+		if (((((charOneX > xMinBomb) | (charOneX = xMinBomb)) & ((charOneX < xMaxBomb) | (charOneX = xMaxBomb)) & (charOneY = xYBomb)) | (((charOneY > yMinBomb) | (charOneY = yMinBomb)) & ((charOneY < yMaxBomb) | (charOneY = yMaxBomb)) & (charOneX = yXBomb))) | (((charTwoX > xMinBomb) | (charTwoX = xMinBomb)) & ((charTwoX < xMaxBomb) | (charTwoX = xMaxBomb)) & (charTwoY = xYBomb)) | (((charTwoY > yMinBomb) | (charTwoY = yMinBomb)) & ((charTwoY < yMaxBomb) | (charTwoY = yMaxBomb)) & (charTwoX = yXBomb))) { return true; } 
+
+		return false;
+   }
+}

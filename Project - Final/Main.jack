@@ -1,0 +1,17 @@
+class Main {
+    function void main() {
+		var int yMax, yMin, xMax, xMin;
+		var Game game;
+
+		// Resolution: 256x512
+
+		let xMin = 0;
+		let xMax = (512-32)/16;
+		let yMin = 0;
+		let yMax = 256-32;
+		let game = Game.new(xMax, xMin, yMax, yMin);
+		do game.run();
+		do game.dispose();
+        return;
+    }
+}
