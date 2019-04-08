@@ -1,0 +1,24 @@
+CHIP Memory {
+    IN in[16], load, address[15];
+    OUT out[16];
+
+    PARTS:
+    //Se o bit mais significativo do endereço for 0, o endereço se refere a RAM;
+    //Se for 1, se refere aos dipositivos de I/O;
+    //O próximo bit especifica se o endereço se refere à tela;
+
+    DMux(in=load, sel=address[14], a=loadRAM, b=IOaddress);
+    DMux(in=IOaddress, sel=address[13], a=loadScreen);
+
+    RAM16K(in=in, load=loadRAM, address=address[0..13], out=RAMout);
+
+    Screen(in=in, load=loadScreen, address=address[0..12], out=screenout);
+
+    Keyboard(out=keyboardout);
+
+    //Da mesma forma que a entrada, serão os dois primeiros bits que decidirãoo
+    //qual chip deve fornecer a saída;
+
+    Mux16(a=screenout, b=keyboardout, sel=address[13], out=IOout);
+    Mux16(a=RAMout, b=IOout, sel=address[14], out=out); 
+}
